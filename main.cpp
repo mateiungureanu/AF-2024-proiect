@@ -128,7 +128,6 @@ bool bipartit(int i) {
     return true;
 }
 
-// Verifică dacă graful este bipartit
 bool verifica() {
     for (int i = 1; i <= n; i++) {
         if (rosu[i] == 0) {
@@ -139,7 +138,6 @@ bool verifica() {
     return true;
 }
 
-// Funcția pentru muchii critice
 int muchii_critice(int nod, int p, int k) {
     visited[nod] = true;
     int adancime_minima = INT_MAX;
@@ -242,7 +240,6 @@ void dijkstra(int nod) {
             }
         }
     }
-
     for (int i = 1; i <= n; i++) {
         if (cost[i] == INT_MAX) {
             cout << "Inf " << endl;
