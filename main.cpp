@@ -21,11 +21,11 @@ vector<int> lista_adj[100];
 vector<int> lista_adj_transpus[100];
 vector<int> v[100];
 vector<int> cost;
-vector<int> grad(n + 1, 0);
-vector<int> culoare(n + 1, -1);
+vector<int> grad(n, 0);
+vector<int> culoare(n, -1);
 vector<int> parent(100, -1);
 vector<int> rang(100, 1);
-vector<bool> adaugat(n + 1, false);
+vector<bool> adaugat(n, false);
 vector<pair<int, int>> adj[100];
 stack<int> s;
 queue<int> q;
@@ -36,11 +36,12 @@ vector<vector<int>> dist(100, vector<int>(100, INT_MAX));
 vector<vector<bool>> culori_disponibile(n + 1, vector<bool>(7, true));
 
 void matrice_adiacenta() {
+    memset(a, 0, sizeof(a));
     fin >> n >> m >> o;
-    for (int i = 1; i <= n; i++)
-        for (int j = 1; j <= n; j++)
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
             a[i][j] = 0;
-    for (int i = 1; i <= m; i++) {
+    for (int i = 0; i < m; i++) {
         int x, y;
         fin >> x >> y;
         a[x][y] = 1;
@@ -50,8 +51,8 @@ void matrice_adiacenta() {
 }
 
 void afis_matrice() {
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= n; j++)
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++)
             cout << a[i][j] << " ";
         cout << endl;
     }
@@ -59,9 +60,9 @@ void afis_matrice() {
 
 void lista_adiacenta() {
     fin >> n >> m >> o;
-    for (int i = 1; i <= n; i++)
+    for (int i = 0; i < n; i++)
         lista_adj[i].clear();
-    for (int i = 1; i <= m; i++) {
+    for (int i = 0; i < m; i++) {
         int x, y;
         fin >> x >> y;
         lista_adj[x].push_back(y);
@@ -71,7 +72,7 @@ void lista_adiacenta() {
 }
 
 void afis_lista() {
-    for (int i = 1; i <= n; i++) {
+    for (int i = 0; i < n; i++) {
         cout << i << ": ";
         for (auto j : lista_adj[i])
             cout << j << " ";
@@ -80,47 +81,66 @@ void afis_lista() {
 }
 
 void trecere_matrice_lista() {
-    for (int i = 1; i <= n; i++)
+    for (int i = 0; i < n; i++)
         lista_adj[i].clear();
-    for (int i = 1; i <= n; i++)
-        for (int j = 1; j <= n; j++)
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
             if (a[i][j] == 1)
                 lista_adj[i].push_back(j);
 }
 
 void trecere_lista_matrice() {
-    for (int i = 1; i <= n; i++)
+    memset(a, 0, sizeof(a));
+    for (int i = 0; i < n; i++)
         for (int j : lista_adj[i])
             a[i][j] = 1;
 }
 
-void DFS(int i) {
-    visited[i] = 1;
-    cout << i << " ";
-    for (int j : lista_adj[i]) {
-        if (visited[j] == 0) {
-            DFS(j);
+void DFS(int start) {
+    fill(visited, visited + n, false);
+    while (!s.empty()) {
+        s.pop();
+    }
+    s.push(start);
+    visited[start] = true;
+    while (!s.empty()) {
+        int nod = s.top();
+        s.pop();
+        cout << nod << " ";
+        for (int vecin : lista_adj[nod]) {
+            if (!visited[vecin]) {
+                visited[vecin] = true;
+                s.push(vecin);
+            }
         }
     }
 }
 
 void BFS(int start) {
-    q.push(start);
-    visited[start] = 1;
+    fill(visited, visited + n, false);
     while (!q.empty()) {
-        int i = q.front();
         q.pop();
-        cout << i << " ";
-        for (int j : lista_adj[i]) {
-            if (!visited[j]) {
-                visited[j] = 1;
-                q.push(j);
+    }
+    q.push(start);
+    visited[start] = true;
+    while (!q.empty()) {
+        int nod = q.front();
+        q.pop();
+        cout << nod << " ";
+        for (int vecin : lista_adj[nod]) {
+            if (!visited[vecin]) {
+                visited[vecin] = true;
+                q.push(vecin);
             }
         }
     }
 }
 
 bool bipartit(int i) {
+    fill(rosu, rosu + n, 0);
+    while (!q.empty()) {
+        q.pop();
+    }
     q.push(i);
     rosu[i] = 1;
     while (!q.empty()) {
@@ -139,7 +159,7 @@ bool bipartit(int i) {
 }
 
 bool verifica() {
-    for (int i = 1; i <= n; i++) {
+    for (int i = 0; i < n; i++) {
         if (rosu[i] == 0) {
             if (!bipartit(i))
                 return false;
@@ -149,7 +169,10 @@ bool verifica() {
 }
 
 bool bfs_cuplaj(int n, int m) {
-    for (int u = 1; u <= n; ++u) {
+    while (!q.empty()) {
+        q.pop();
+    }
+    for (int u = 0; u < n; ++u) {
         if (pairing[u] == 0) {
             dist_cuplaj[u] = 0;
             q.push(u);
@@ -191,9 +214,11 @@ bool dfs_cuplaj(int u) {
 }
 
 int cuplaj_maxim(int n, int m) {
+    fill(pairing, pairing + n, 0);
+    fill(dist_cuplaj, dist_cuplaj + n, INT_MAX);
     int max_matching = 0;
     while (bfs_cuplaj(n, m)) {
-        for (int u = 1; u <= n; ++u) {
+        for (int u = 0; u < n; u++) {
             if (pairing[u] == 0 && dfs_cuplaj(u)) {
                 max_matching++;
             }
@@ -244,9 +269,25 @@ void noduri_critice(int nod, int p, int k) {
     }
 }
 
+void tarjan(int nod) {
+    fill(visited, visited + n, false);
+    fill(ranks, ranks + n, -1);
+    fill(low, low + n, -1);
+    muchii_critice(nod, -1, 0);
+    fill(visited, visited + n, false);
+    fill(ranks, ranks + n, -1);
+    noduri_critice(nod, -1, 0);
+}
+
 void lista_adiacenta_weighted() {
+    for (int i = 0; i < n; i++) {
+        adj[i].clear();
+    }
+    while (!q3.empty()) {
+        q3.pop();
+    }
     fin >> n >> m;
-    for(int i = 1; i <= m; i++) {
+    for(int i = 0; i < m; i++) {
         int x, y, w;
         fin >> x >> y >> w;
         adj[x].push_back({y, w});
@@ -279,8 +320,12 @@ void reuniune(int x, int y) {
 }
 
 void kruskal() {
+    fill(parent.begin(), parent.end(), -1);
+    fill(rang.begin(), rang.end(), 1);
     while(!q3.empty()) {
-        int w = get<0>(q3.top()), qa = get<1>(q3.top()), qb = get<2>(q3.top());
+        int w = get<0>(q3.top());
+        int qa = get<1>(q3.top());
+        int qb = get<2>(q3.top());
         q3.pop();
         if(gaseste_parinte(qa) != gaseste_parinte(qb)) {
             reuniune(qa, qb);
@@ -289,6 +334,10 @@ void kruskal() {
 }
 
 void prim() {
+    fill(adaugat.begin(), adaugat.end(), false);
+    while (!q3.empty()) {
+        q3.pop();
+    }
     adaugat[1] = true;
     for (auto [x, w] : adj[1]) {
         if (!adaugat[x]) {
@@ -311,7 +360,11 @@ void prim() {
 }
 
 void dijkstra(int nod) {
-    cost.resize(n + 1, INT_MAX);
+    fill(cost.begin(), cost.end(), INT_MAX);
+    fill(parent.begin(), parent.end(), -1);
+    while (!q2.empty()) {
+        q2.pop();
+    }
     cost[nod] = 0;
     q2.push({0, nod});
     while (!q2.empty()) {
@@ -320,13 +373,14 @@ void dijkstra(int nod) {
         for (auto i : adj[f.second]) {
             if (cost[i.first] > cost[f.second] + i.second) {
                 cost[i.first] = cost[f.second] + i.second;
+                parent[i.first] = f.second;
                 q2.push({cost[i.first], i.first});
             }
         }
     }
-    for (int i = 1; i <= n; i++) {
+    for (int i = 0; i < n; i++) {
         if (cost[i] == INT_MAX) {
-            cout << "Inf " << endl;
+            cout << "inf " << endl;
         } else {
             cout << cost[i] << " ";
         }
@@ -335,9 +389,11 @@ void dijkstra(int nod) {
 }
 
 void bellman_ford(int nod) {
+    fill(cost.begin(), cost.end(), INT_MAX);
+    fill(parent.begin(), parent.end(), -1);
     cost[nod] = 0;
-    for (int i = 1; i <= n - 1; i++) {
-        for (int u = 1; u <= n; u++) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int u = 0; u < n; u++) { 
             for (auto edge : adj[u]) {
                 int v = edge.first;
                 int weight = edge.second;
@@ -348,7 +404,7 @@ void bellman_ford(int nod) {
             }
         }
     }
-    for (int u = 1; u <= n; u++) {
+    for (int u = 0; u < n; u++) {
         for (auto edge : adj[u]) {
             int v = edge.first;
             int weight = edge.second;
@@ -358,7 +414,7 @@ void bellman_ford(int nod) {
             }
         }
     }
-    for (int i = 1; i <= n; i++) {
+    for (int i = 0; i < n; i++) {
         if (cost[i] == INT_MAX) {
             cout << "inf ";
         } else {
@@ -369,27 +425,30 @@ void bellman_ford(int nod) {
 }
 
 void floyd_warshall() {
-    for (int i = 1; i <= n; i++) {
+    for (int i = 0; i < n; i++) {
+        fill(dist[i].begin(), dist[i].end(), INT_MAX);
+    }
+    for (int i = 0; i < n; i++) {
         dist[i][i] = 0;
     }
-    for (int u = 1; u <= n; u++) {
+    for (int u = 0; u < n; u++) {
         for (auto edge : adj[u]) {
             int v = edge.first;
             int weight = edge.second;
             dist[u][v] = weight;
         }
     }
-    for (int k = 1; k <= n; k++) {
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
+    for (int k = 0; k < n; k++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
                 if (dist[i][k] != INT_MAX && dist[k][j] != INT_MAX && dist[i][j] > dist[i][k] + dist[k][j]) {
                     dist[i][j] = dist[i][k] + dist[k][j];
                 }
             }
         }
     }
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= n; j++) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
             if (dist[i][j] == INT_MAX) {
                 cout << "inf ";
             } else {
@@ -411,6 +470,10 @@ void dfs_topologic(int nod) {
 }
 
 void sortare_topologica() {
+    fill(visited, visited + n, false);
+    while (!s.empty()) {
+        s.pop();
+    }
     for (int i = 0; i < n; i++) {
         if (!visited[i]) {
             dfs_topologic(i);
@@ -444,6 +507,14 @@ void dfs_transpus_kosaraju(int nod) {
 }
 
 void kosaraju() {
+    fill(visited, visited + n, false);
+    while (!s.empty()) {
+        s.pop();
+    }
+    for (int i = 0; i < n; i++) {
+        lista_adj_transpus[i].clear();
+    }
+    componente.clear();
     for (int i = 0; i < n; i++) {
         if (!visited[i]) {
             dfs_kosaraju(i);
@@ -472,7 +543,10 @@ void kosaraju() {
 }
 
 bool bfs_flux(int s, int t) {
-    queue<int> q;
+    fill(visited, visited + n, false);
+    while (!q.empty()) {
+        q.pop();
+    }
     q.push(s);
     visited[s] = true;
     while (!q.empty()) {
@@ -493,6 +567,7 @@ bool bfs_flux(int s, int t) {
 }
 
 int edmonds_karp(int s, int t) {
+    memset(flux, 0, sizeof(flux));
     int max_flow = 0;
     while (bfs_flux(s, t)) {
         int path_flow = INT_MAX;
@@ -511,6 +586,7 @@ int edmonds_karp(int s, int t) {
 }
 
 bool dfs_flux(int s, int t) {
+    fill(visited, visited + n, false);
     visited[s] = true;
     if (s == t) {
         return true;
@@ -527,6 +603,8 @@ bool dfs_flux(int s, int t) {
 }
 
 int ford_fulkerson(int s, int t) {
+    memset(flux, 0, sizeof(flux));
+    fill(parent.begin(), parent.end(), -1);
     int max_flow = 0;
     while (true) {
         fill(visited, visited + n + 1, false);
@@ -549,6 +627,7 @@ int ford_fulkerson(int s, int t) {
 }
 
 int min_cost_max_flow(int s, int t) {
+    memset(flux, 0, sizeof(flux));
     int max_flow = 0;
     int min_cost = 0;
     while (true) {
@@ -575,10 +654,14 @@ int min_cost_max_flow(int s, int t) {
 }
 
 void sase_colorare() {
-    for (int i = 1; i <= n; i++) {
+    fill(culoare.begin(), culoare.end(), 0);
+    for (int i = 0; i < n; i++) {
+        fill(culori_disponibile[i].begin(), culori_disponibile[i].end(), true);
+    }
+    for (int i = 0; i < n; i++) {
         grad[i] = lista_adj[i].size();
     }
-    for (int i = 1; i <= n; i++) {
+    for (int i = 0; i < n; i++) {
         if (s.size() > 6) {
             if (grad[i] <= 5) {
                 s.push(i);
@@ -589,14 +672,14 @@ void sase_colorare() {
             }
         }
     }
-    for (int i = 1; i <= n; ++i) {
+    for (int i = 0; i < n; ++i) {
         if (grad[i] > 0) {
             for (int vecin : lista_adj[i]) {
                 if (culoare[vecin] != -1) {
                     culori_disponibile[i][culoare[vecin]] = false;
                 }
             }
-            for (int c = 1; c <= 6; c++) {
+            for (int c = 0; c < 6; c++) {
                 if (culori_disponibile[i][c]) {
                     culoare[i] = c;
                     break;
@@ -612,7 +695,7 @@ void sase_colorare() {
                 culori_disponibile[nod][culoare[vecin]] = false;
             }
         }
-        for (int c = 1; c <= 6; c++) {
+        for (int c = 0; c < 6; c++) {
             if (culori_disponibile[nod][c]) {
                 culoare[nod] = c;
                 break;
@@ -620,21 +703,8 @@ void sase_colorare() {
         }
     }
     cout << "Colorare finala:\n";
-    for (int i = 1; i <= n; i++) {
+    for (int i = 0; i < n; i++) {
         cout << "nod " << i << " -> culoare " << culoare[i] << "\n";
     }
 }
 
-void reset_all() {
-    fill(rosu, rosu + n + 1, 0);
-    fill(visited, visited + n + 1, false);
-    fill(ranks, ranks + n + 1, -1);
-    fill(pairing, pairing + n + m + 1, 0);
-    fill(parent.begin(), parent.end(), -1);
-    fill(rang.begin(), rang.end(), 1);
-    fill(cost.begin(), cost.end(), INT_MAX);
-    memset(flux, 0, sizeof(flux));
-    for (int i = 1; i <= n; i++) {
-        fill(culori_disponibile[i].begin(), culori_disponibile[i].end(), true);
-    }
-}
