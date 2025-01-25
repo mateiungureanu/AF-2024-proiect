@@ -170,7 +170,7 @@ bool verifica() {
     return true;
 }
 
-bool bfs_cuplaj(int n, int m) {
+bool bfs_cuplaj(int n) {
     while (!q.empty()) {
         q.pop();
     }
@@ -215,11 +215,11 @@ bool dfs_cuplaj(int u) {
     return false;
 }
 
-int cuplaj_maxim(int n, int m) {
+int cuplaj_maxim(int n) {
     fill(pairing, pairing + n, 0);
     fill(dist_cuplaj, dist_cuplaj + n, INT_MAX);
     int max_matching = 0;
-    while (bfs_cuplaj(n, m)) {
+    while (bfs_cuplaj(n)) {
         for (int u = 0; u < n; u++) {
             if (pairing[u] == 0 && dfs_cuplaj(u)) {
                 max_matching++;
@@ -229,14 +229,14 @@ int cuplaj_maxim(int n, int m) {
     return max_matching;
 }
 
-int muchii_critice(int nod, int p, int k) {
+int muchii_critice(int nod, int parinte, int rang_tarjan) {
     visited[nod] = true;
-    ranks[nod] = k;
+    ranks[nod] = rang_tarjan;
     int adancime_minima = INT_MAX;
     for (int vecin : lista_adj[nod]) {
-        if (vecin != p) {
+        if (vecin != parinte) {
             if (!visited[vecin]) {
-                int x = muchii_critice(vecin, nod, k + 1);
+                int x = muchii_critice(vecin, nod, rang_tarjan + 1);
                 adancime_minima = min(x, adancime_minima);
                 if (x > ranks[vecin])
                     cout << nod << ' ' << vecin << '\n';
@@ -248,17 +248,17 @@ int muchii_critice(int nod, int p, int k) {
     return adancime_minima;
 }
 
-void noduri_critice(int nod, int p, int k) {
+void noduri_critice(int nod, int parinte, int rang_tarjan) {
     visited[nod] = true;
-    ranks[nod] = low[nod] = k;
+    ranks[nod] = low[nod] = rang_tarjan;
     int copii = 0;
     for (int vecin : lista_adj[nod]) {
-        if (vecin != p) {
+        if (vecin != parinte) {
             if (!visited[vecin]) {
                 copii++;
-                noduri_critice(vecin, nod, k + 1);
+                noduri_critice(vecin, nod, rang_tarjan + 1);
                 low[nod] = min(low[nod], low[vecin]);
-                if (low[vecin] >= ranks[nod] && p != -1) {
+                if (low[vecin] >= ranks[nod] && parinte != -1) {
                     cout << nod << '\n';
                 }
             } else {
@@ -266,7 +266,7 @@ void noduri_critice(int nod, int p, int k) {
             }
         }
     }
-    if (p == -1 && copii > 1) {
+    if (parinte == -1 && copii > 1) {
         cout << nod << '\n';
     }
 }
