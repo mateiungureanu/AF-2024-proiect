@@ -26,6 +26,7 @@ vector<int> culoare(n, -1);
 vector<int> parent(100, -1);
 vector<int> rang(100, 1);
 vector<int> ciclu_eulerian;
+vector<int> dist_dag(100, INT_MAX);
 vector<bool> adaugat(n, false);
 vector<pair<int, int>> adj[100];
 stack<int> s;
@@ -483,6 +484,43 @@ void sortare_topologica() {
     while (!s.empty()) {
         cout << s.top() << " ";
         s.pop();
+    }
+    cout << endl;
+}
+
+void sortare_topologica_dag() {
+    fill(visited, visited + n, false);
+    while (!s.empty()) {
+        s.pop();
+    }
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            dfs_topologic(i);
+        }
+    }
+}
+
+void dag_drum_minim(int start) {
+    sortare_topologica_dag();
+    dist_dag[start] = 0;
+    while (!s.empty()) {
+        int u = s.top();
+        s.pop();
+        if (dist_dag[u] != INT_MAX) {
+            for (auto [v, cost] : adj[u]) {
+                if (dist_dag[u] + cost < dist_dag[v]) {
+                    dist_dag[v] = dist_dag[u] + cost;
+                }
+            }
+        }
+    }
+    cout << "Distante minime de la nodul " << start << ":\n";
+    for (int i = 0; i < n; i++) {
+        if (dist_dag[i] == INT_MAX) {
+            cout << "inf ";
+        } else {
+            cout << dist_dag[i] << " ";
+        }
     }
     cout << endl;
 }
