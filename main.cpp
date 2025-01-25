@@ -25,6 +25,7 @@ vector<int> grad(n, 0);
 vector<int> culoare(n, -1);
 vector<int> parent(100, -1);
 vector<int> rang(100, 1);
+vector<int> ciclu_eulerian;
 vector<bool> adaugat(n, false);
 vector<pair<int, int>> adj[100];
 stack<int> s;
@@ -706,5 +707,70 @@ void sase_colorare() {
     for (int i = 0; i < n; i++) {
         cout << "nod " << i << " -> culoare " << culoare[i] << "\n";
     }
+}
+
+int levenshtein_distance(string cuvant1, string cuvant2) {
+    int size1 = cuvant1.size();
+    int size2 = cuvant2.size();
+    for (int i = 0; i < n; i++) {
+        fill(dist[i].begin(), dist[i].end(), INT_MAX);
+    }
+    for (int i = 0; i <= size1; i++) {
+        dist[i][0] = i;
+    }
+    for (int j = 0; j <= size2; j++) {
+        dist[0][j] = j;
+    }
+    for (int i = 1; i <= size1; i++) {
+        for (int j = 1; j <= size2; j++) {
+            if (cuvant1[i - 1] == cuvant2[j - 1]) {
+                dist[i][j] = dist[i - 1][j - 1];
+            } else {
+                dist[i][j] = min({dist[i - 1][j] + 1, dist[i][j - 1] + 1, dist[i - 1][j - 1] + 1});
+            }
+        }
+    }
+    return dist[size1][size2];
+}
+
+void hierholzer() {
+    for (int i = 1; i <= n; i++) {
+        if (lista_adj[i].size() % 2 != 0) {
+            cout << "Graful nu are circuit eulerian." << endl;
+            return;
+        }
+    }
+    int start = -1;
+    for (int i = 1; i <= n; i++) {
+        if (!lista_adj[i].empty()) {
+            start = i;
+            break;
+        }
+    }
+    if (start == -1) {
+        cout << "Graful este gol." << endl;
+        return;
+    }
+    s.push(start);
+    while (!s.empty()) {
+        int nod = s.top();
+        if (!lista_adj[nod].empty()) {
+            int next_nod = lista_adj[nod].back();
+            lista_adj[nod].pop_back();
+            auto it = find(lista_adj[next_nod].begin(), lista_adj[next_nod].end(), nod);
+            if (it != lista_adj[next_nod].end()) {
+                lista_adj[next_nod].erase(it);
+            }
+            s.push(next_nod);
+        } else {
+            ciclu_eulerian.push_back(nod);
+            s.pop();
+        }
+    }
+    reverse(ciclu_eulerian.begin(), ciclu_eulerian.end());
+    for (int nod : ciclu_eulerian) {
+        cout << nod << " ";
+    }
+    cout << endl;
 }
 
