@@ -233,15 +233,15 @@ int muchii_critice(int nod, int p, int k) {
     visited[nod] = true;
     ranks[nod] = k;
     int adancime_minima = INT_MAX;
-    for (int i = 0; i < lista_adj[nod].size(); i++) {
-        if (lista_adj[nod][i] != p) {
-            if (!visited[lista_adj[nod][i]]) {
-                int x = muchii_critice(lista_adj[nod][i], nod, k + 1);
+    for (int vecin : lista_adj[nod]) {
+        if (vecin != p) {
+            if (!visited[vecin]) {
+                int x = muchii_critice(vecin, nod, k + 1);
                 adancime_minima = min(x, adancime_minima);
-                if (x > ranks[lista_adj[nod][i]])
-                    cout << nod << ' ' << lista_adj[nod][i] << '\n';
+                if (x > ranks[vecin])
+                    cout << nod << ' ' << vecin << '\n';
             } else {
-                adancime_minima = min(adancime_minima, ranks[lista_adj[nod][i]]);
+                adancime_minima = min(adancime_minima, ranks[vecin]);
             }
         }
     }
@@ -252,17 +252,17 @@ void noduri_critice(int nod, int p, int k) {
     visited[nod] = true;
     ranks[nod] = low[nod] = k;
     int copii = 0;
-    for (int i = 0; i < lista_adj[nod].size(); i++) {
-        if (lista_adj[nod][i] != p) {
-            if (!visited[lista_adj[nod][i]]) {
+    for (int vecin : lista_adj[nod]) {
+        if (vecin != p) {
+            if (!visited[vecin]) {
                 copii++;
-                noduri_critice(lista_adj[nod][i], nod, k + 1);
-                low[nod] = min(low[nod], low[lista_adj[nod][i]]);
-                if (low[lista_adj[nod][i]] >= ranks[nod] && p != -1) {
+                noduri_critice(vecin, nod, k + 1);
+                low[nod] = min(low[nod], low[vecin]);
+                if (low[vecin] >= ranks[nod] && p != -1) {
                     cout << nod << '\n';
                 }
             } else {
-                low[nod] = min(low[nod], ranks[lista_adj[nod][i]]);
+                low[nod] = min(low[nod], ranks[vecin]);
             }
         }
     }
