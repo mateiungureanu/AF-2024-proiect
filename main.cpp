@@ -174,7 +174,7 @@ bool bfs_cuplaj(int n, int m) {
     while (!q.empty()) {
         q.pop();
     }
-    for (int u = 0; u < n; ++u) {
+    for (int u = 0; u < n; u++) {
         if (pairing[u] == 0) {
             dist_cuplaj[u] = 0;
             q.push(u);
@@ -711,7 +711,7 @@ void sase_colorare() {
             }
         }
     }
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; i++) {
         if (grad[i] > 0) {
             for (int vecin : lista_adj[i]) {
                 if (culoare[vecin] != -1) {
