@@ -347,7 +347,8 @@ void prim() {
         }
     }
     while (!q3.empty()) {
-        int qa = get<1>(q3.top()), qb = get<2>(q3.top());
+        int qa = get<1>(q3.top());
+        int qb = get<2>(q3.top());
         q3.pop();
         if (!adaugat[qb]) {
             cout << qa << " " << qb << endl;
@@ -382,7 +383,7 @@ void dijkstra(int nod) {
     }
     for (int i = 0; i < n; i++) {
         if (cost[i] == INT_MAX) {
-            cout << "inf " << endl;
+            cout << "inf ";
         } else {
             cout << cost[i] << " ";
         }
@@ -463,9 +464,9 @@ void floyd_warshall() {
 
 void dfs_topologic(int nod) {
     visited[nod] = true;
-    for (int i = 0; i < lista_adj[nod].size(); i++) {
-        if (!visited[lista_adj[nod][i]]) {
-            dfs_topologic(lista_adj[nod][i]);
+    for (int vecin : lista_adj[nod]) {
+        if (!visited[vecin]) {
+            dfs_topologic(vecin);
         }
     }
     s.push(nod);
@@ -481,6 +482,10 @@ void sortare_topologica() {
             dfs_topologic(i);
         }
     }
+}
+
+void sortare_topologica_afisare() {
+    sortare_topologica();
     while (!s.empty()) {
         cout << s.top() << " ";
         s.pop();
@@ -488,33 +493,21 @@ void sortare_topologica() {
     cout << endl;
 }
 
-void sortare_topologica_dag() {
-    fill(visited, visited + n, false);
-    while (!s.empty()) {
-        s.pop();
-    }
-    for (int i = 0; i < n; i++) {
-        if (!visited[i]) {
-            dfs_topologic(i);
-        }
-    }
-}
-
 void dag_drum_minim(int start) {
-    sortare_topologica_dag();
+    fill(dist_dag.begin(), dist_dag.end(), INT_MAX);
+    sortare_topologica();
     dist_dag[start] = 0;
     while (!s.empty()) {
         int u = s.top();
         s.pop();
         if (dist_dag[u] != INT_MAX) {
-            for (auto [v, cost] : adj[u]) {
-                if (dist_dag[u] + cost < dist_dag[v]) {
-                    dist_dag[v] = dist_dag[u] + cost;
+            for (auto [v, w] : adj[u]) {
+                if (dist_dag[u] + w < dist_dag[v]) {
+                    dist_dag[v] = dist_dag[u] + w;
                 }
             }
         }
     }
-    cout << "Distante minime de la nodul " << start << ":\n";
     for (int i = 0; i < n; i++) {
         if (dist_dag[i] == INT_MAX) {
             cout << "inf ";
@@ -573,7 +566,7 @@ void kosaraju() {
             dfs_transpus_kosaraju(nod);
         }
     }
-    for (const auto& componenta : componente) {
+    for (auto componenta : componente) {
         for (int nod : componenta) {
             cout << nod << " ";
         }
@@ -645,12 +638,8 @@ int ford_fulkerson(int s, int t) {
     memset(flux, 0, sizeof(flux));
     fill(parent.begin(), parent.end(), -1);
     int max_flow = 0;
-    while (true) {
-        fill(visited, visited + n + 1, false);
+    while (dfs_flux(s, t)) {
         int path_flow = INT_MAX;
-        if (!dfs_flux(s, t)) {
-            break;
-        }
         for (int v = t; v != s; v = parent[v]) {
             int u = parent[v];
             path_flow = min(path_flow, a[u][v] - flux[u][v]);
