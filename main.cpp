@@ -17,6 +17,7 @@ int pairing[100];
 int dist_cuplaj[100]; 
 int a[100][100];
 int flux[100][100];
+int dp[100][1 << 20];
 vector<int> lista_adj[100];
 vector<int> lista_adj_transpus[100];
 vector<int> v[100];
@@ -801,3 +802,30 @@ void hierholzer() {
     cout << endl;
 }
 
+int min_cost_hamiltonian_cycle() {
+    for (int i = 0; i < n; i++) {
+        fill(dp[i], dp[i] + (1 << n), INT_MAX);
+    }
+    dp[0][1] = 0;
+    for (int mask = 0; mask < (1 << n); mask++) {
+        for (int i = 0; i < n; i++) {
+            if (mask & (1 << i)) {
+                for (int j : lista_adj[i]) {
+                    if (mask & (1 << j)) {
+                        int prev_mask = mask ^ (1 << i);
+                        if (dp[j][prev_mask] != INT_MAX && a[j][i] != 0) {
+                            dp[i][mask] = min(dp[i][mask], dp[j][prev_mask] + a[j][i]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    int min_cost = INT_MAX;
+    for (int i = 1; i < n; i++) {
+        if (a[i][0] != 0 && dp[i][(1 << n) - 1] != INT_MAX) {
+            min_cost = min(min_cost, dp[i][(1 << n) - 1] + a[i][0]);
+        }
+    }
+    return (min_cost == INT_MAX) ? -1 : min_cost;
+}
