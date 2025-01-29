@@ -4,6 +4,8 @@
 #include <stack>
 #include <queue>
 #include <climits>
+#include <algorithm>
+#include <cstring>
 using namespace std;
 
 ifstream fin("graf.in");
