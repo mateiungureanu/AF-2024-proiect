@@ -20,7 +20,7 @@ int dist_cuplaj[100];
 int a[100][100];
 int flux[100][100];
 int dp[100][1 << 20];
-vector<int> lista_adj[100];
+vector<vector<int>> lista_adj;
 vector<int> lista_adj_transpus[100];
 vector<int> v[100];
 vector<int> cost;
@@ -65,6 +65,7 @@ void afis_matrice() {
 
 void lista_adiacenta() {
     fin >> n >> m >> o;
+    lista_adj.resize(n);
     for (int i = 0; i < n; i++)
         lista_adj[i].clear();
     for (int i = 0; i < m; i++) {
@@ -366,6 +367,8 @@ void prim() {
 }
 
 void dijkstra(int nod) {
+    cost.resize(n);
+    parent.resize(n);
     fill(cost.begin(), cost.end(), INT_MAX);
     fill(parent.begin(), parent.end(), -1);
     while (!q2.empty()) {
@@ -395,6 +398,8 @@ void dijkstra(int nod) {
 }
 
 void bellman_ford(int nod) {
+    cost.resize(n);
+    parent.resize(n);
     fill(cost.begin(), cost.end(), INT_MAX);
     fill(parent.begin(), parent.end(), -1);
     cost[nod] = 0;
@@ -431,6 +436,7 @@ void bellman_ford(int nod) {
 }
 
 void floyd_warshall() {
+    dist.resize(n, vector<int>(n, INT_MAX));
     for (int i = 0; i < n; i++) {
         fill(dist[i].begin(), dist[i].end(), INT_MAX);
     }
@@ -497,6 +503,7 @@ void sortare_topologica_afisare() {
 }
 
 void dag_drum_minim(int start) {
+    dist_dag.resize(n, INT_MAX);
     fill(dist_dag.begin(), dist_dag.end(), INT_MAX);
     sortare_topologica();
     dist_dag[start] = 0;
@@ -685,6 +692,8 @@ int min_cost_max_flow(int s, int t) {
 }
 
 void sase_colorare() {
+    culoare.resize(n, 0);
+    culori_disponibile.resize(n + 1, vector<bool>(7, true));
     fill(culoare.begin(), culoare.end(), 0);
     for (int i = 0; i < n; i++) {
         fill(culori_disponibile[i].begin(), culori_disponibile[i].end(), true);
@@ -742,7 +751,8 @@ void sase_colorare() {
 int levenshtein_distance(string cuvant1, string cuvant2) {
     int size1 = cuvant1.size();
     int size2 = cuvant2.size();
-    for (int i = 0; i < n; i++) {
+    dist.resize(size1 + 1, vector<int>(size2 + 1, INT_MAX));
+    for (int i = 0; i < size1 + 1; i++) {
         fill(dist[i].begin(), dist[i].end(), INT_MAX);
     }
     for (int i = 0; i <= size1; i++) {
